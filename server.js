@@ -11,15 +11,15 @@ app.use(express.json());
 // Connect to database
 const db = mysql.createConnection(
     {
-      host: 'localhost',
-      // Your MySQL username,
-      user: 'root',
-      // Your MySQL password
-      password: 'jesusisking3',
-      database: 'election'
+        host: 'localhost',
+        // Your MySQL username,
+        user: 'root',
+        // Your MySQL password
+        password: 'jesusisking3',
+        database: 'election'
     },
     console.log('Connected to the election database.')
-  );
+);
 
 // Get all candidates
 app.get('/api/candidates', (req, res) => {
@@ -28,18 +28,18 @@ app.get('/api/candidates', (req, res) => {
     FROM candidates 
     LEFT JOIN parties 
     ON candidates.party_id = parties.id`;
-  
+
     db.query(sql, (err, rows) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
-      res.json({
-        message: 'success',
-        data: rows
-      });
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json({
+            message: 'success',
+            data: rows
+        });
     });
-  });
+});
 
 // Get a single candidate
 // In the database call, we'll assign the captured value populated 
@@ -56,155 +56,157 @@ app.get('/api/candidate/:id', (req, res) => {
     WHERE candidates.id = ?`;
 
     const params = [req.params.id];
-  
+
     db.query(sql, params, (err, row) => {
-      if (err) {
-        res.status(400).json({ error: err.message });
-        return;
-      }
-      res.json({
-        message: 'success',
-        data: row
-      });
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+        res.json({
+            message: 'success',
+            data: row
+        });
     });
-  });
+});
 
 // Delete a candidate
 app.delete('/api/candidate/:id', (req, res) => {
     const sql = `DELETE FROM candidates WHERE id = ?`;
     const params = [req.params.id];
-  
-    db.query(sql, params, (err, result) => {
-      if (err) {
-        res.statusMessage(400).json({ error: res.message });
-      } else if (!result.affectedRows) {
-        res.json({
-          message: 'Candidate not found'
-        });
-      } else {
-        res.json({
-          message: 'deleted',
-          changes: result.affectedRows,
-          id: req.params.id
-        });
-      }
-    });
-  });
 
- // Create a candidate - The SQL command and the SQL parameters were 
- //assigned to the sql and params variables
- //we're using object destructuring to pull the body property out of the 
- //request object. Until now, we've been passing the entire request object 
- //to the routes in the req parameter. In the callback function block, we assign 
- //errors to receive the return from the inputCheck function
+    db.query(sql, params, (err, result) => {
+        if (err) {
+            res.statusMessage(400).json({ error: res.message });
+        } else if (!result.affectedRows) {
+            res.json({
+                message: 'Candidate not found'
+            });
+        } else {
+            res.json({
+                message: 'deleted',
+                changes: result.affectedRows,
+                id: req.params.id
+            });
+        }
+    });
+});
+
+// Create a candidate - The SQL command and the SQL parameters were 
+//assigned to the sql and params variables
+//we're using object destructuring to pull the body property out of the 
+//request object. Until now, we've been passing the entire request object 
+//to the routes in the req parameter. In the callback function block, we assign 
+//errors to receive the return from the inputCheck function
 app.post('/api/candidate', ({ body }, res) => {
     const errors = inputCheck(body, 'first_name', 'last_name', 'industry_connected');
     if (errors) {
-      res.status(400).json({ error: errors });
-      return;
+        res.status(400).json({ error: errors });
+        return;
     }
     const sql = `INSERT INTO candidates (first_name, last_name, industry_connected)
     VALUES (?,?,?)`;
-  const params = [body.first_name, body.last_name, body.industry_connected];
-  
-  db.query(sql, params, (err, result) => {
-    if (err) {
-      res.status(400).json({ error: err.message });
-      return;
-    }
-    res.json({
-      message: 'success',
-      data: body
-    });
-  });
+    const params = [body.first_name, body.last_name, body.industry_connected];
 
-  });
+    db.query(sql, params, (err, result) => {
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+        res.json({
+            message: 'success',
+            data: body
+        });
+    });
+
+});
 
 // ROUTE for parties
-  app.get('/api/parties', (req, res) => {
+app.get('/api/parties', (req, res) => {
     const sql = `SELECT * FROM parties`;
     db.query(sql, (err, rows) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
-      res.json({
-        message: 'success',
-        data: rows
-      });
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json({
+            message: 'success',
+            data: rows
+        });
     });
-  });
+});
 // Get a single party
-  app.get('/api/party/:id', (req, res) => {
+app.get('/api/party/:id', (req, res) => {
     const sql = `SELECT * FROM parties WHERE id = ?`;
     const params = [req.params.id];
+
     db.query(sql, params, (err, row) => {
-      if (err) {
-        res.status(400).json({ error: err.message });
-        return;
-      }
-      res.json({
-        message: 'success',
-        data: row
-      });
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+        res.json({
+            message: 'success',
+            data: row
+        });
     });
-  });
+});
 // delete for party
-  app.delete('/api/party/:id', (req, res) => {
+app.delete('/api/party/:id', (req, res) => {
     const sql = `DELETE FROM parties WHERE id = ?`;
     const params = [req.params.id];
     db.query(sql, params, (err, result) => {
-      if (err) {
-        res.status(400).json({ error: res.message });
-        // checks if anything was deleted
-      } else if (!result.affectedRows) {
-        res.json({
-          message: 'Party not found'
-        });
-      } else {
-        res.json({
-          message: 'deleted',
-          changes: result.affectedRows,
-          id: req.params.id
-        });
-      }
+        if (err) {
+            res.status(400).json({ error: res.message });
+            // checks if anything was deleted
+        } else if (!result.affectedRows) {
+            res.json({
+                message: 'Party not found'
+            });
+        } else {
+            res.json({
+                message: 'deleted',
+                changes: result.affectedRows,
+                id: req.params.id
+            });
+        }
     });
-  });
+});
 
-  // Update a candidate's party
+// Update a candidate's party
 app.put('/api/candidate/:id', (req, res) => {
+     // Candidate is allowed to not have party affiliation
     const errors = inputCheck(req.body, 'party_id');
     if (errors) {
-    res.status(400).json({ error: errors });
-    return;
-}
+        res.status(400).json({ error: errors });
+        return;
+    }
     const sql = `UPDATE candidates SET party_id = ? 
                  WHERE id = ?`;
     const params = [req.body.party_id, req.params.id];
     db.query(sql, params, (err, result) => {
-      if (err) {
-        res.status(400).json({ error: err.message });
-        // check if a record was found
-      } else if (!result.affectedRows) {
-        res.json({
-          message: 'Candidate not found'
-        });
-      } else {
-        res.json({
-          message: 'success',
-          data: req.body,
-          changes: result.affectedRows
-        });
-      }
+        if (err) {
+            res.status(400).json({ error: err.message });
+            // check if a record was found
+        } else if (!result.affectedRows) {
+            res.json({
+                message: 'Candidate not found'
+            });
+        } else {
+            res.json({
+                message: 'success',
+                data: req.body,
+                changes: result.affectedRows
+            });
+        }
     });
-  });
+});
 
-  // Default response for any other request (Not Found)
+// Default response for any other request (Not Found)
 app.use((req, res) => {
     res.status(404).end();
-  });
+});
 
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-  });
+});
