@@ -6,5 +6,6 @@ const router = express.Router();
 router.use(require('./candidateRoutes'));
 router.use(require('./partyRoutes'));
 router.use(require('./voterRoutes'));
+router.use(require('./voteRoutes')); // tell the router object to use the votes route alongside the others
 
 module.exports = router;
